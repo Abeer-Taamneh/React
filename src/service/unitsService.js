@@ -1,9 +1,9 @@
 import httpService from "./httpService";
-const tableName = "categories";
-const arr = ["nameen", "namear", "descriptionen", "descriptionar","logo","parentid","publishednameen","publishednamear","categorytype"];
+const tableName = "units";
+const arr = ["nameen", "namear"];
+
 async function _get() {
-  const res = await httpService._get(tableName);  
-  return res;
+    return await httpService._get(tableName);  
 }
 async function _delete(id) {
   await httpService._delete(id,tableName);

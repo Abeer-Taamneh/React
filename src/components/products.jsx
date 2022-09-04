@@ -9,10 +9,10 @@ import {IconButton,Button,Dialog,AppBar,Toolbar,Typography} from '@mui/material'
 import MyTextField from './common/myTextField';
 import ConfirmDeleteDialog from './common/ConfirmDeleteDialog';
 import categoriesService from '../service/categoriesService';
-
+import unitsService from '../service/unitsService';
 
 //=============================================================================================================================================
-function ProductsTable({products,onUpdate}) {
+function ProductsTable({products,units,onUpdate}) {
   const[selectedProduct, setSelectedProduct]= useState(null);
   const [openConfirmDelDlg, setopenConfirmDelDlg] = useState(false);
   const [open, setOpen] = useState(false);
@@ -25,6 +25,8 @@ function ProductsTable({products,onUpdate}) {
         <th>Product Description</th>
         <th>Brand</th>
         <th>Origin</th>
+        <th>quantity</th>
+        <th>unit</th>
         <th>barcode</th>
         <th>descriptionen</th>
         <th>descriptionar</th>
@@ -39,6 +41,8 @@ function ProductsTable({products,onUpdate}) {
         <td>{(product.category)&&product.category.publishednamear}</td>
         <td>{(product.brand)&&product.brand.nameen}</td>
         <td>{(product.origin)&&product.origin.nameen}</td>
+        <td>{product.quantity}</td>
+        <td>{(product.unit)&&product.unit.nameen}</td>
         <td>{product.barcode}</td>
         <td>{product.descriptionen}</td>
         <td>{product.descriptionar}</td>
@@ -74,6 +78,7 @@ function ProductsTable({products,onUpdate}) {
 
     </table>
     <ProductsDialog
+      units = {units}
       open={open}
       setOpen={setOpen}
       product ={selectedProduct}
@@ -94,13 +99,16 @@ function ProductsTable({products,onUpdate}) {
   )
 }
 //========================================================================================================================
-function ProductsDialog({open,setOpen,product,onUpdate}) {
+function ProductsDialog({open,setOpen,product,units,onUpdate}) {
   const [nameen,setNameen] = useState(product?product.nameen:'');
   const [namear,setNamear,] = useState(product?product.namear:'');
   const [image,setImage,] = useState(product?product.image:'');
   const[descriptionen,setdescriptionen]=useState(product?product.descriptionen:'');
   const [descriptionar,setdescriptionar] = useState(product?product.descriptionar:'');
   const[barcode,setBarcode]=useState(product?product.barcode:'')
+  const[selectedUnit,setselectedUnit]=useState(null);
+  const[quantity,setQuantity]=useState(product?product.quantity:'')
+ 
   useEffect(()=>{
     console.log('product',product);
     if(!product)return;
@@ -110,6 +118,8 @@ function ProductsDialog({open,setOpen,product,onUpdate}) {
     setdescriptionen(product.descriptionen);
     setdescriptionar(product.descriptionar);
     setBarcode(product.barcode);
+    setQuantity(product.quantity);
+    setselectedUnit(units.find(u=>u.id == product.unitid))
   }, [product]);
 
   return (
@@ -139,6 +149,8 @@ function ProductsDialog({open,setOpen,product,onUpdate}) {
                 product.descriptionen=descriptionen;
                 product.descriptionar=descriptionar;
                 product.barcode=barcode;
+                product.quantity=quantity;
+                product.unitid = selectedUnit.id;
                 await productsService._save(product);
                 onUpdate()}    
           }
@@ -152,7 +164,14 @@ function ProductsDialog({open,setOpen,product,onUpdate}) {
         <MyTextField label ={'Brand Id'} disabled value ={product?product.brandid:'***'}  />
         <MyTextField label ={'Origin id'}  disabled value ={product?product.originid:'***'}  />
         <MyTextField label ={'Category'}  disabled value ={product?product.categoryid:'***'} />
-          
+        <MyTextField label ={'quantity'} placeholder = {'* quantity'} value ={quantity} setValue ={setQuantity}  />
+        <AutoCompleteSelect
+          textLabel ='Unit'
+          options ={units}
+          selectedOption = {selectedUnit}
+          onChange ={(unit)=>setselectedUnit(unit)}
+          labelOption = 'nameen'
+        />
           <MyTextField label ={'Barcode'} placeholder = {'* Barcode'} value ={barcode} setValue ={setBarcode}  />
           <MyTextField label ={'Image'} placeholder = {'* image'} value ={image} setValue ={setImage}  />
           <MyTextField label ={' descriptionen '} placeholder = {'* descriptionen'} value ={descriptionen} setValue ={setdescriptionen} rows={4} multiline />
@@ -168,10 +187,11 @@ export default function Products() {
   const [products, setProducts] = useState([]);
   const[selectedProduct, setSelectedProduct]= useState(null);
   const[selectedOrigin, setSelectedOrigin]= useState(null);
+  
   const [open, setOpen] = useState(false);
   const [brands, setBrands] = useState([]);
   const[origin,setOrigin]=useState([]);
-  
+  const[units,setUnits]=useState([]);
   useEffect(()=>{
     update();
   }, []);
@@ -181,11 +201,12 @@ async function update(){
     const _brands= await brandsService._get();
     const _origins= await originsService._get();
     const _categories= await categoriesService._get();
-
+    const _units= await unitsService._get();
     _products.forEach(product=>{
         product.brand = _brands.find(br=>br.id == product.brandid); 
         product.origin = _origins.find(or=>or.id== product.originid);
         product.category = _categories.find(cat=>cat.id== product.categoryid);
+        product.unit = _units.find(un =>un.id==product.unitid)
     })
 
     setSelectedProduct(null);
@@ -194,6 +215,7 @@ async function update(){
     setselectedBrand(null);
     setSelectedOrigin(null);
     setOrigin(_origins);
+    setUnits(_units);
   }
     return (
         <div className='row'>
@@ -218,6 +240,7 @@ async function update(){
                     labelImage = 'flag'
                   />
                 </div>
+
               <div className='row m-2'>
                 <CategoriesTreeView
                   className = 'm-2' 
@@ -244,7 +267,7 @@ async function update(){
                       </IconButton>
                   </div>
                   <div className='row'>
-                    <ProductsTable products ={products} onUpdate ={async ()=>{await update()}}/>
+                    <ProductsTable products ={products} units = {units} onUpdate ={async ()=>{await update()}}/>
                   </div>
               
             </div>
@@ -253,6 +276,7 @@ async function update(){
               open={open}
               setOpen={setOpen}
               product ={selectedProduct}
+              units = {units}
               onUpdate = {async ()=>{await update()}}
             />
          </div>         
