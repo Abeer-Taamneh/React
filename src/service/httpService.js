@@ -1,17 +1,24 @@
 import axios from "axios";
 import _ from "lodash";
+import {toast} from 'react-toastify'
+import {getToken} from './userService'
 const url = "http://147.182.183.104/api/sql";
-
+axios.defaults.headers.common['x-auth-token']=getToken();
 async function _get(tableName) {
   const sql = `select * from ${tableName}`;
-  const res = await axios.post(url, { operation: 1, sql: sql });
-  return res.data;
+  try {
+    const res = await axios.post(url, { operation: 1, sql: sql });
+    return res.data;  
+  } catch (error) {
+    toast.error(error.message);  
+  }
 }
 
 async function _delete(id,tableName) {
   const sql = `delete  from ${tableName} where id = '${id}'`;
   console.log("sql", sql);
   const res = await axios.post(url, { operation: 1, sql: sql });
+  if(res.status!==200) toast.error(res.data);
   return res.data;
 }
 

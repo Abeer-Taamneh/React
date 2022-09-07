@@ -98,7 +98,7 @@ function BandsTable({ brands,setBrands }) {
         <th>logo</th>
       </tr>
     </thead>
-    {brands.map((brand) => (
+    {brands&&brands.map((brand) => (
       <tr key={brand.id}>
         <td>{brand.id}</td>
         <td>{brand.nameen}</td>

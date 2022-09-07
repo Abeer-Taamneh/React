@@ -10,7 +10,6 @@ import MyTextField from './common/myTextField';
 import ConfirmDeleteDialog from './common/ConfirmDeleteDialog';
 import categoriesService from '../service/categoriesService';
 import unitsService from '../service/unitsService';
-
 //=============================================================================================================================================
 function ProductsTable({products,units,onUpdate}) {
   const[selectedProduct, setSelectedProduct]= useState(null);
@@ -267,7 +266,10 @@ async function update(){
                       </IconButton>
                   </div>
                   <div className='row'>
-                    <ProductsTable products ={products} units = {units} onUpdate ={async ()=>{await update()}}/>
+                    <ProductsTable 
+                    products ={products} 
+                    units = {units}
+                     onUpdate ={async ()=>{await update()}}/>
                   </div>
               
             </div>
