@@ -13,7 +13,7 @@ export default function Login(props)  {
 
         <Button autoFocus color="inherit" 
         onClick= {()=>{
-            const user = {id:0,name:userName,password:password}
+            const user = {name:userName,password:password}
             loginUser(user);
         }}
         >

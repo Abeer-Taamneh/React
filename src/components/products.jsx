@@ -184,8 +184,11 @@ export default function Products() {
   const [selectedProductCategory,setselectedProductCategory] = useState(null)
   const [selectedBrand,setselectedBrand] = useState(null)
   const [products, setProducts] = useState([]);
+  const [dispProducts, setdispProducts] = useState([]);
+  
   const[selectedProduct, setSelectedProduct]= useState(null);
   const[selectedOrigin, setSelectedOrigin]= useState(null);
+  const [categories,setcategories] = useState([]);
   
   const [open, setOpen] = useState(false);
   const [brands, setBrands] = useState([]);
@@ -205,9 +208,16 @@ async function update(){
         product.brand = _brands.find(br=>br.id == product.brandid); 
         product.origin = _origins.find(or=>or.id== product.originid);
         product.category = _categories.find(cat=>cat.id== product.categoryid);
+        // if(product.category){
+        //   if(!product.category.products) product.category.products = [];
+        //   product.category.products.push(product);
+        // }
         product.unit = _units.find(un =>un.id==product.unitid)
     })
 
+    _categories.forEach(category=>{
+      category.products = _products.filter(p=>p.categoryid == category.id)
+    })
     setSelectedProduct(null);
     setProducts(_products);
     setBrands(_brands);
@@ -215,6 +225,8 @@ async function update(){
     setSelectedOrigin(null);
     setOrigin(_origins);
     setUnits(_units);
+    setcategories(_categories);
+    setdispProducts(_products);
   }
     return (
         <div className='row'>
@@ -244,7 +256,11 @@ async function update(){
                 <CategoriesTreeView
                   className = 'm-2' 
                   allowEdit={false} 
+                  categories = {categories}
                   onSelect ={(category)=>{
+                    if(category&&category.products){
+                      setdispProducts(category.products);
+                    }
                     if(category&&category.categorytype !=0)
                         setselectedProductCategory(category)
                     else
@@ -267,7 +283,7 @@ async function update(){
                   </div>
                   <div className='row'>
                     <ProductsTable 
-                    products ={products} 
+                    products ={dispProducts} 
                     units = {units}
                      onUpdate ={async ()=>{await update()}}/>
                   </div>

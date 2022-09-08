@@ -93,24 +93,34 @@ function CategoriesDialog({open,setOpen,onSave,category}) {
   }
   
 //=============================================================================================
-export function CategoriesTreeView({allowEdit,onSelect}) {
-   const [allCategories, setallCategories] = useState([]);
+export function CategoriesTreeView({allowEdit,onSelect,categories}) {
+   const [allCategories, setallCategories] = useState([categories]);
    const [baseCategories,setbaseCategories]=useState([]);
    const [openConfirmDelDlg, setopenConfirmDelDlg] = useState(false);
    const [selectedCategory, setselectedCategory] = useState(null);
    const [open, setOpen] = useState(false);
+
    useEffect(() => {
-    update();
-   
-   }, [] );
-  async function update(){
-    const _allCategories = await categoriesService._get();
+    // update();
+    const _allCategories = categories; 
+    if(!categories)return;
     _allCategories.forEach(category => {
         category.subcategories = _allCategories.filter(c=>c.parentid == category.id)
     });     
     setallCategories(_allCategories);
     setbaseCategories(_allCategories.filter(c=>c.parentid == 0));
-  }
+
+   
+   }, [categories] );
+
+//    async function update(){
+//     const _allCategories = await categoriesService._get();
+//     _allCategories.forEach(category => {
+//         category.subcategories = _allCategories.filter(c=>c.parentid == category.id)
+//     });     
+//     setallCategories(_allCategories);
+//     setbaseCategories(_allCategories.filter(c=>c.parentid == 0));
+//   }
   
   function renderCategoryLabel(category){
     const class_name = (category.categorytype ==1)? 'row bg-secondary':'row';
@@ -205,7 +215,7 @@ export function CategoriesTreeView({allowEdit,onSelect}) {
                 onConfirm ={async()=>{
                     if(!selectedCategory)return;
                     await categoriesService._delete(selectedCategory.id);
-                    await update();
+                    // await update();
                     }}
             /> 
             
@@ -213,19 +223,37 @@ export function CategoriesTreeView({allowEdit,onSelect}) {
                 open={open}
                 setOpen={setOpen}
                 category ={selectedCategory}
-                onUpdate={async()=>{await update()}}
+                // onUpdate={async()=>{await update()}}
             />
             
         </div>
     )
 }
 //=============================================================================================
-export function Categories({user}){
+export function CategoriesAdminPage({user}){
     const [selectedCategory,setselectedCategory] = useState(null)
+    const [categories,setcategories] = useState([]);
+
+    useEffect(()=>{
+        update();
+      }, []);
+    
+    async function update(){
+        const _categories= await categoriesService._get();
+
+        console.log(_categories);
+        setcategories(_categories);
+    }
+    console.log(categories)
+    
     return (
         <div className='row'>
             <div className='col'>
-                <CategoriesTreeView allowEdit={false} onSelect ={(category)=>setselectedCategory(category)}/>
+                <CategoriesTreeView 
+                    allowEdit={true} 
+                    onSelect ={(category)=>setselectedCategory(category)}
+                    categories = {categories}
+                />
             </div>
             <div className='col'>
                 {selectedCategory&&<div>

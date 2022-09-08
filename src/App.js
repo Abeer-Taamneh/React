@@ -6,7 +6,7 @@ import Brands from'./components/brands'
 import Products from './components/products';
 import Origin from './components/origins';
 import Units from './components/units';
-import { CategoriesTreeView } from './components/categories';
+import { CategoriesAdminPage } from './components/categories';
 import Register from './components/register';
 import Login from './components/login';
 import Logout from './components/logout';
@@ -25,7 +25,7 @@ const App = () => {
         <Route path='/brands' element={<Brands user={user} />}/>
            <Route path='/products' element = {<Products/>} />
            <Route path='/origins' element = {<Origin/>} />
-           <Route path='/categories' element = {<CategoriesTreeView allowEdit={true}/>} />
+           <Route path='/categories' element = {<CategoriesAdminPage allowEdit={true}/>} />
            <Route path='/register' element = {<Register/>} />
            <Route path='/units' element = {<Units/>} />
            <Route path='/login' element = {<Login/>} />
