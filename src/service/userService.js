@@ -31,19 +31,23 @@ export async function loginUser(user){
     }
 }
 export  async function getCurrentUser(){
-    let user = null;
+    let _user = null;
     try{
         const jwt =localStorage.getItem('token');
-        user=jwtDecode(jwt);
+        if(jwt)
+            _user=jwtDecode(jwt);
       }
       catch(ex){
         toast.error(ex.message);
       }
       //
-      const _allUsers =  await httpService._get('users');
-      user = _allUsers.find(u=>u.id == user.id);
-      
-    return user;
+    //   console.log('user',user);
+      if(_user){
+        const _allUsers =  await httpService._get('users');
+        // console.log('_allUsers',_allUsers);
+        return(_allUsers.find(u=>u.id == _user.id));
+      }
+    return null;
 }
 export  function logOut(){
     localStorage.removeItem('token');
