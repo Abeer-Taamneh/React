@@ -30,7 +30,7 @@ export async function loginUser(user){
         toast.error(ex.response.data);
     }
 }
-export  function getCurrentUser(){
+export  async function getCurrentUser(){
     let user = null;
     try{
         const jwt =localStorage.getItem('token');
@@ -39,7 +39,11 @@ export  function getCurrentUser(){
       catch(ex){
         toast.error(ex.message);
       }
-      return user;
+      //
+      const _allUsers =  await httpService._get('users');
+      user = _allUsers.find(u=>u.id == user.id);
+      
+    return user;
 }
 export  function logOut(){
     localStorage.removeItem('token');
